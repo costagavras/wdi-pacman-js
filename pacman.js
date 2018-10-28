@@ -1,7 +1,7 @@
 // Setup initial game stats
 var score = 0;
 var lives = 2;
-
+var powerPellets = 4;
 
 // Define your ghosts here
 var inky = {
@@ -54,16 +54,27 @@ function clearScreen() {
 }
 
 function displayStats() {
-  console.log('Score: ' + score + '     Lives: ' + lives);
+  if (powerPellets > 0){
+    console.log('Score: ' + score + '     Lives: ' + lives + '\n\nPower pellets: ' + powerPellets);
+  } else {
+    console.log('Score: ' + score + '     Lives: ' + lives);
+  }
 }
 
 function displayMenu() {
   console.log('\n\nSelect Option:\n');  // each \n creates a new line
   console.log('(d) Eat Dot');
-  console.log('(1) Eat Inky');
-  console.log('(2) Eat Blinky');
-  console.log('(3) Eat Pinky');
-  console.log('(4) Eat Clyde');
+  console.log('(p) Eat Power-Pellet');
+  var i;
+  var edible;
+  for (i = 0; i < ghosts.length; i++) {
+      if (ghosts[i].edible ? edible = "edible" : edible = "inedible");
+      console.log("(" + (i+1) + ") Eat " + ghosts[i].name + " (" + edible + ")");
+  }
+  // console.log('(1) Eat' + ghosts[0].name + "(" + ghosts[0].edible + ")");
+  // console.log('(2) Eat' + ghosts[1].name + "(" + ghosts[1].edible + ")");
+  // console.log('(3) Eat' + ghosts[2].name + "(" + ghosts[2].edible + ")");
+  // console.log('(4) Eat' + ghosts[3].name + "(" + ghosts[3].edible + ")");
   console.log('(q) Quit');
 }
 
@@ -82,10 +93,25 @@ function eatDot() {
 function eatGhost(ghost) {
   if (!ghost.edible){
     lives -=1;
-    console.log(`\nA ${ghost.colour} ${ghost.name} ate you!`);
+    console.log(`\n\nA ${ghost.colour} ${ghost.name} ate me!`);
+    if (lives < 0){
+    console.log(`\nAnd now I'really dead!`);
+    process.exit();
+    }
+  } else {console.log(`\nAte a ${ghost.character} ${ghost.name} and he was good!`);
+    score += 200;
+    ghost.edible = false;
   }
 }
 
+function eatPowerPellet(){
+  console.log('\nGo Go Gadget Power Pellet!');
+  score += 50;
+  ghosts.forEach(function(ghost) {
+    ghost.edible = true;
+  });
+  powerPellets -=1;
+}
 
 // Process Player's Input
 function processInput(key) {
@@ -96,6 +122,13 @@ function processInput(key) {
       break;
     case 'd':
       eatDot();
+      break;
+    case 'p':
+      if (powerPellets < 1){
+        console.log('\nNo more Pellets left!');
+        break;
+      }
+      eatPowerPellet();
       break;
     case '1':
       eatGhost(inky);
